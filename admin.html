@@ -6,7 +6,7 @@
 <title>[TEAM JINO] 개정법 안내 관리 | 노무그룹지노</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="logo.png">
-<link rel="stylesheet" href="style.css?v=202611250556">
+<link rel="stylesheet" href="style.css?v=202611251054">
 <style>
 .adm table{width:100%;border-collapse:collapse;background:#fff;font-size:14.5px}
 .adm th,.adm td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}
@@ -83,11 +83,11 @@
 </div>
 <div id="ovRoot"></div>
 
-<script src="common.js?v=202611250556"></script>
+<script src="common.js?v=202611251054"></script>
 <script>
 /* ---------- JINO 열쇠 (주소록·급여대행과 같은 구성원 비밀번호) ---------- */
 var KEY_URL='https://raw.githubusercontent.com/jinolabor/config-files/main/key.json', KEY_URLS=[KEY_URL,'https://raw.githubusercontent.com/dhkim0629-ops/config-files/main/key.json'];
-var TOKEN='',ME=null,AKEY=null,ITEMS=[],ISSUES=[],MEMBERS=[],ADDR=[],TAB='dash',Q='';
+var TOKEN='',ME=null,AKEY=null,ITEMS=[],ISSUES=[],MEMBERS=[],ADDR=[],TAB='dash',Q='',MST='';
 var unb64=function(s){return Uint8Array.from(atob(s),function(c){return c.charCodeAt(0)})};
 async function fetchKeys(){var last=null;for(var i=0;i<KEY_URLS.length;i++){try{var r=await fetch(KEY_URLS[i]+'?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('열쇠 파일을 불러오지 못했습니다');return await r.json()}catch(e){last=e}}throw last||new Error('열쇠 파일을 불러오지 못했습니다')}
 async function unwrap(pw,e){var base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
@@ -198,16 +198,24 @@ function memDetail(id){
 
 /* ---------- 회원사 관리 ---------- */
 function renderMem(){
-  var L=MEMBERS.filter(function(m){return !Q||m.name.indexOf(Q)>=0});
   var h='<div class="note">회원사는 <b>사업자등록번호</b>로 로그인합니다. 번호는 서버에 암호화(해시)해서 저장하므로 화면에는 일부만 보입니다. 「주소록에서 추가」를 누르면 주소록의 자문중 회사를 골라 등록할 수 있습니다.</div>'+
-    '<div class="toolbar"><input type="search" id="mq" placeholder="회사명 검색" value="'+esc(Q)+'"><span class="sp"></span><button class="btn" id="addFree">직접 추가</button><button class="btn pri" id="addAddr">주소록에서 추가</button></div>';
-  h+=L.length?'<div class="tw"><table><thead><tr><th>회원사</th><th>사업자번호</th><th>사용</th><th>마지막 접속</th><th>메모</th></tr></thead><tbody>'+L.map(function(m){
-    return '<tr class="click" data-edit="'+m.id+'"><td><b>'+esc(m.name)+'</b>'+(m.addr_key?' <span class="muted" style="font-size:12px">주소록 연결</span>':'')+'</td><td style="white-space:nowrap" class="muted">'+esc(m.biz_mask)+'</td><td>'+(m.active?'<span class="pill ok">사용 중</span>':'<span class="pill off">중지</span>')+'</td><td style="white-space:nowrap">'+ago(m.last_login)+'</td><td style="font-size:13px">'+esc(m.memo||'')+'</td></tr>'}).join('')+'</tbody></table></div>':'<div class="empty">등록된 회원사가 없습니다.</div>';
+    '<div class="toolbar"><input type="search" id="mq" placeholder="회사명 검색" value="'+esc(Q)+'"><select id="mst" style="border:1px solid #ced4da;border-radius:8px;padding:7px 8px;font-family:inherit;font-size:14px"><option value="">전체</option><option value="on">사용 중</option><option value="off">중지</option></select><span class="muted" id="mcnt" style="font-size:13.5px"></span><span class="sp"></span><button class="btn" id="addFree">직접 추가</button><button class="btn pri" id="addAddr">주소록에서 추가</button></div><div id="mlist"></div>';
   var v=$('#v-mem');v.innerHTML=h;
-  $('#mq').oninput=function(){Q=this.value.trim();renderMem();var q=$('#mq');q.focus();q.setSelectionRange(q.value.length,q.value.length)};
+  $('#mst').value=MST;
+  $('#mq').addEventListener('input',function(){Q=this.value.trim();drawMem()});
+  $('#mst').onchange=function(){MST=this.value;drawMem()};
   $('#addFree').onclick=function(){memEdit(null,{})};
   $('#addAddr').onclick=pickAddr;
-  $$('[data-edit]',v).forEach(function(r){r.onclick=function(){memEdit(MEMBERS.find(function(x){return x.id===r.dataset.edit}))}});
+  drawMem();
+}
+function drawMem(){
+  var L=MEMBERS.filter(function(m){return (!Q||m.name.indexOf(Q)>=0)&&(!MST||(MST==='on')===!!m.active)});
+  var on=MEMBERS.filter(function(m){return m.active}).length;
+  $('#mcnt').textContent='전체 '+MEMBERS.length+'곳 (사용 중 '+on+' · 중지 '+(MEMBERS.length-on)+')'+(Q||MST?' · 검색 결과 '+L.length+'곳':'');
+  var box=$('#mlist');
+  box.innerHTML=L.length?'<div class="tw"><table><thead><tr><th>회원사</th><th>사업자번호</th><th>사용</th><th>마지막 접속</th><th>메모</th></tr></thead><tbody>'+L.map(function(m){
+    return '<tr class="click" data-edit="'+m.id+'"><td><b>'+esc(m.name)+'</b>'+(m.addr_key?' <span class="muted" style="font-size:12px">주소록 연결</span>':'')+'</td><td style="white-space:nowrap" class="muted">'+esc(m.biz_mask)+'</td><td>'+(m.active?'<span class="pill ok">사용 중</span>':'<span class="pill off">중지</span>')+'</td><td style="white-space:nowrap">'+ago(m.last_login)+'</td><td style="font-size:13px">'+esc(m.memo||'')+'</td></tr>'}).join('')+'</tbody></table></div>':'<div class="empty">'+(MEMBERS.length?'검색 결과가 없습니다.':'등록된 회원사가 없습니다.')+'</div>';
+  $$('[data-edit]',box).forEach(function(r){r.onclick=function(){memEdit(MEMBERS.find(function(x){return x.id===r.dataset.edit}))}});
 }
 function pickAddr(){
   var used=new Set(MEMBERS.map(function(m){return m.addr_key}).filter(Boolean));
