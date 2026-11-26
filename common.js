@@ -142,8 +142,8 @@ function printDialog(opt,mode){
 function printHtml(items,mode,who,checks,scopeLabel){
   var stc={done:'#868e96',soon:'#d9480f',plan:'#1971c2',tbd:'#7048e8'};
   var mark=function(o){var c=checks['item:'+o.no];return c==='done'?'✓ 완료':c==='na'?'해당없음':c==='ask'?'상담요청':'☐'};
-  var h='<div class="pcov"><img src="logo.png" alt=""><div><div class="pbr">NOMU GROUP JINO · 회원사 전용</div><h1>'+esc(SET.period)+' 노동관계법령 개정 안내 '+(mode==='sum'?'(요약)':'(상세)')+'</h1>'+
-    '<div class="pmt">'+(who?esc(who)+' · ':'')+esc(scopeLabel)+' '+items.length+'건 · 출력일 '+fmt(TODAY)+' · 법령 조사 기준일 '+esc(SET.basis)+' (이후 변경은 월별 업데이트 참고)</div></div></div>';
+  var h='<div class="pcov"><img src="logo.png" alt=""><div><h1>'+esc(SET.period)+' 노동관계법령 개정 안내 '+(mode==='sum'?'(요약)':'(상세)')+'</h1>'+
+    '<div class="pmt">'+esc(scopeLabel)+' '+items.length+'건 · 출력일 '+fmt(TODAY)+' · 법령 조사 기준일 '+esc(SET.basis)+' (이후 변경은 월별 업데이트 참고)</div></div></div>';
   if(mode==='sum'){
     h+='<table class="ptb"><colgroup><col style="width:13%"><col style="width:17%"><col style="width:36%"><col style="width:26%"><col style="width:8%"></colgroup><thead><tr><th>시행일</th><th>법령</th><th>주요 내용</th><th>회사가 할 일</th><th>확인</th></tr></thead><tbody>'+
       items.map(function(o){return '<tr><td class="c"><b>'+(o.dt?fmt(o.dt):'미정')+'</b><br><span class="pst" style="background:'+(stc[o.s]||'#1971c2')+'">'+esc(o.sl)+'</span></td><td>'+esc(o.law)+(o.cond?'<br><span class="pcd">'+esc(o.cond)+' 해당</span>':'')+(o.rules?'<br><span class="prl">취업규칙 개정</span>':'')+'</td><td>'+esc(o.summary)+'</td><td>'+esc(o.action)+'</td><td class="c">'+mark(o)+'</td></tr>'}).join('')+'</tbody></table>';
@@ -204,8 +204,8 @@ function rateSection(r){
     (r.basis?'<div class="rbs"><b>근거</b> '+esc(r.basis)+'</div>':'')+'</section>';
 }
 function ratesHtml(R,label,who){
-  var h='<div class="pcov"><img src="logo.png" alt=""><div><div class="pbr">NOMU GROUP JINO · 회원사 전용</div><h1>'+esc(SET.period)+' 각종 고시금액'+(label?' — '+esc(label):'')+'</h1>'+
-    '<div class="pmt">'+(who?esc(who)+' · ':'')+R.length+'개 표 · 출력일 '+fmt(TODAY)+' · 「미확정」은 출력일 현재 고시 전인 값입니다</div></div></div>';
+  var h='<div class="pcov"><img src="logo.png" alt=""><div><h1>'+esc(SET.period)+' 각종 고시금액'+(label?' — '+esc(label):'')+'</h1>'+
+    '<div class="pmt">'+R.length+'개 표 · 출력일 '+fmt(TODAY)+' · 「미확정」은 출력일 현재 고시 전인 값입니다</div></div></div>';
   h+=R.map(function(r){
     return '<div class="prs"><div class="prh"><b>'+esc(r.title)+'</b>'+(r.unit?'<span>단위: '+esc(r.unit)+'</span>':'')+'</div>'+
       (r.pending?'<div class="prp">'+esc(r.pending)+'</div>':'')+rateTable(r,'prt'+((r.cols||[]).length>8?' wide':''))+
