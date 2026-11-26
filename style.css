@@ -656,3 +656,8 @@ table.rtb tbody tr:hover td,table.rtb tbody tr:hover th{background:#f1f6ff}
 .ppchk label{display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap}
 @media(max-width:700px){.ppchk label{white-space:normal}.rsh .rpbtn{margin-left:auto}}
 @media print{.rpbtn{display:none!important}}
+.rprt{margin-top:10px;padding-top:9px;border-top:1px dashed #c9d6ea;display:flex;flex-direction:column;gap:3px;font-size:14px}
+.rprt .rprth{color:var(--navy)}
+.rprt .k{display:inline-block;min-width:48px;text-align:center;color:var(--ink);background:#e6eefb;padding:0 6px;border-radius:2px;margin-right:8px;font-size:13px}
+#rPrint{display:flex;flex-direction:column;align-items:center;line-height:1.35;padding:10px 18px}
+#rPrint small{font-size:12px;font-weight:500;opacity:.85}

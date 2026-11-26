@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <link rel="icon" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
-<link rel="stylesheet" href="style.css?v=202611261429">
+<link rel="stylesheet" href="style.css?v=202611261434">
 </head>
 <body>
 
@@ -88,7 +88,7 @@
 </div>
 <div class="loading" id="loading" hidden>불러오는 중…</div>
 
-<script src="common.js?v=202611261429"></script>
+<script src="common.js?v=202611261434"></script>
 <script>
 var TOKEN='',ME=null,P={},ITEMS=[],ISSUES=[],RATES=[],RCAT='',CHECKS={},TAB='todo',F='open',ALLF={cat:''},CUR_ISSUE=null,OPEN=new Set(),PROF_OPEN=false;
 var TKEY='jino-law-member-token';
@@ -260,8 +260,8 @@ function renderRates(){
     '<div class="lnbinfo"><b>업데이트 안내</b>새 고시가 나오면 바로 반영합니다.</div>'+CONTACT_HTML+'</aside>';
   var h='<div class="crumb">홈 <i>›</i> 각종 고시금액'+(RCAT?' <i>›</i> '+esc(RCAT):'')+'</div>'+
     '<h2 class="ptitle">'+(RCAT?esc(RCAT)+' 고시금액':'각종 고시금액')+'</h2>'+
-    '<div class="rintro"><div><b>매년 바뀌는 노동·사회보험 고시금액을 연도별로 정리했습니다.</b><br>2027년 값 중 아직 고시되지 않은 항목은 <span class="tbdp">미확정</span>으로 표시하며, 고시되는 대로 업데이트합니다.<br>인쇄할 때는 필요한 표만 골라 출력할 수 있습니다.'+(last?'<span class="rupd">최종 업데이트 '+fmt(new Date(last))+'</span>':'')+'</div>'+
-    '<button class="btn pri" id="rPrint">🖨 고시금액표 인쇄·PDF</button></div>';
+    '<div class="rintro"><div><b>매년 바뀌는 노동·사회보험 고시금액을 연도별로 정리했습니다.</b><br>2027년 값 중 아직 고시되지 않은 항목은 <span class="tbdp">미확정</span>으로 표시하며, 고시되는 대로 업데이트합니다.<div class="rprt"><b class="rprth">🖨 인쇄·PDF는 필요한 만큼 골라서 출력할 수 있습니다.</b><span><b class="k">전체</b> '+RATES.length+'개 표를 한 번에</span><span><b class="k">분야별</b> 최저임금·4대보험·건설업 등 분야만</span><span><b class="k">표별</b> 각 표 제목 옆 「이 표만 인쇄」 또는 미리보기에서 체크</span></div>'+(last?'<span class="rupd">최종 업데이트 '+fmt(new Date(last))+'</span>':'')+'</div>'+
+    '<button class="btn pri" id="rPrint">🖨 고시금액표 인쇄·PDF<small>전체·분야별·표별 선택</small></button></div>';
   if(!L.length)h+='<div class="empty">등록된 고시금액이 없습니다.</div>';
   h+=L.map(function(r){return rateSection(r)}).join('');
   v.innerHTML='<div class="lay">'+side+'<div class="cont">'+h+'</div></div>';
