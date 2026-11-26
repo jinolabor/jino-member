@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <link rel="icon" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
-<link rel="stylesheet" href="style.css?v=202611261400">
+<link rel="stylesheet" href="style.css?v=202611261411">
 </head>
 <body>
 
@@ -24,7 +24,8 @@
      <li><i>📋</i><div><b>개정사항 한눈에 보기</b><span>시행일 순·분야별로 정리하고, 항목마다 「회사가 할 일」을 안내합니다</span></div></li>
      <li><i>⚖️</i><div><b>개정 전·후 조문 비교</b><span>근거 조문, 바뀐 내용, 실무상 유의사항과 법령 원문 바로가기</span></div></li>
      <li><i>📰</i><div><b>매월 노동법 업데이트</b><span>매월 초 새 개정·입법예고 소식을 노무그룹지노가 검토해 게시합니다</span></div></li>
-     <li><i>🖨</i><div><b>인쇄·PDF 저장</b><span>요약본·상세본을 내려받아 사내 보고·교육 자료로 활용</span></div></li>
+     <li><i>📊</i><div><b>각종 고시금액</b><span>최저임금·4대보험 요율·산재보상 기준금액·건설업 노임단가 등을 연도별 표로</span></div></li>
+     <li><i>🖨</i><div><b>인쇄·PDF 저장</b><span>요약본·상세본·고시금액표를 내려받아 사내 보고·교육 자료로 활용</span></div></li>
     </ul>
    </div>
   </div>
@@ -41,7 +42,15 @@
     <button class="go" id="lgo" type="submit">열람하기</button>
    </form>
    <div class="lmsg" id="lmsg"></div>
-   <div class="lhelp"><b>이용 문의</b><span>💬 업무톡</span><span>📞 <a href="tel:02-6080-8558">02-6080-8558</a></span><span>✉️ <a href="mailto:timetodh@naver.com">timetodh@naver.com</a></span></div>
+   <div class="lask">
+    <div class="lask-h">📞 이용 문의</div>
+    <p class="lask-p">로그인이 되지 않거나 궁금하신 점이 있으면<br class="pc"> <b>아래 연락처로 언제든 연락 주세요.</b></p>
+    <ul>
+     <li><span class="ic">💬</span><span class="k">업무톡</span><span class="v">노무그룹지노 업무톡으로 문의</span></li>
+     <li><span class="ic">📞</span><span class="k">전화</span><a class="v" href="tel:02-6080-8558">02-6080-8558</a></li>
+     <li><span class="ic">✉️</span><span class="k">메일</span><a class="v" href="mailto:timetodh@naver.com">timetodh@naver.com</a></li>
+    </ul>
+   </div>
   </div>
  </div>
  <div class="cp">© 노무그룹지노 · 서울 용산구 용산센트럴파크타워 업무동 1003호 · www.jinolabor.com</div>
@@ -63,11 +72,13 @@
  <nav class="tabs"><div class="wrap">
   <button class="tab" data-t="todo">개정사항<span class="cnt" id="cntTodo"></span></button>
   <button class="tab" data-t="month">월별 업데이트<span class="new" id="newMonth" hidden>NEW</span></button>
+  <button class="tab" data-t="rates">각종 고시금액</button>
  </div></nav>
  <main class="wrap">
   <div id="profBox"></div>
   <section id="v-todo"></section>
   <section id="v-month" hidden></section>
+  <section id="v-rates" hidden></section>
  </main>
  <footer><div class="fb">
   <span class="ex">본 자료는 <b id="footName"></b> 전용으로 제공되며, 외부 배포를 삼가 주시기 바랍니다.</span><br>
@@ -77,9 +88,9 @@
 </div>
 <div class="loading" id="loading" hidden>불러오는 중…</div>
 
-<script src="common.js?v=202611261400"></script>
+<script src="common.js?v=202611261411"></script>
 <script>
-var TOKEN='',ME=null,P={},ITEMS=[],ISSUES=[],CHECKS={},TAB='todo',F='open',ALLF={cat:''},CUR_ISSUE=null,OPEN=new Set(),PROF_OPEN=false;
+var TOKEN='',ME=null,P={},ITEMS=[],ISSUES=[],RATES=[],RCAT='',CHECKS={},TAB='todo',F='open',ALLF={cat:''},CUR_ISSUE=null,OPEN=new Set(),PROF_OPEN=false;
 var TKEY='jino-law-member-token';
 
 /* ---------- 로그인 ---------- */
@@ -105,7 +116,7 @@ function logout(msg){
   TOKEN='';mem.del(TKEY);mem.sdel(TKEY);$('#app').hidden=true;$('#login').hidden=false;$('#biz').value='';say(msg||'',!!msg);
 }
 $('#btnOut').onclick=function(){logout('')};
-$('#btnPrint').onclick=function(){printDialog({who:ME.name+' 전용',mineItems:ITEMS,allItems:ITEMS,checks:{}})};
+$('#btnPrint').onclick=function(){if(TAB==='rates')ratesPrint(RATES,RCAT,ME.name+' 전용');else printDialog({who:ME.name+' 전용',mineItems:ITEMS,allItems:ITEMS,checks:{}})};
 async function api(fn,args){
   try{return await rpcCall(fn,Object.assign({p_token:TOKEN},args||{}))}
   catch(e){if(e.code==='denied'){logout('로그인이 만료되었습니다. 다시 로그인해 주세요.')}throw e}
@@ -119,7 +130,7 @@ async function boot(){
     var c=await api('law_content');
     ME=c.me;P=ME.profile||{};CHECKS=c.checks||{};
     ITEMS=(c.items||[]).map(prep).sort(function(a,b){return (a.dt?a.dt:9e15)-(b.dt?b.dt:9e15)||a.no-b.no});
-    ISSUES=c.issues||[];
+    ISSUES=c.issues||[];RATES=c.rates||[];
     $('#meName').textContent=ME.name;$('#footName').textContent=ME.name;
     document.title=ME.name+' 전용 · '+SET.period+' 노동관계법령 개정 안내 | 노무그룹지노';
     PROF_OPEN=false; // 회사 정보 확인 단계는 화면에서 뺌 (저장된 정보는 유지)
@@ -128,8 +139,8 @@ async function boot(){
     renderAll();window.scrollTo(0,0);
   }catch(e){$('#loading').hidden=true;if(e.code!=='denied'){$('#login').hidden=false;say('자료를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.',true)}}
 }
-function renderAll(){renderProf();renderTodo();renderMonth();setTab(TAB)}
-function setTab(t){TAB=t;$$('.tab').forEach(function(b){b.classList.toggle('on',b.dataset.t===t)});['todo','month'].forEach(function(k){$('#v-'+k).hidden=k!==t})}
+function renderAll(){renderProf();renderTodo();renderMonth();renderRates();setTab(TAB)}
+function setTab(t){TAB=t;$$('.tab').forEach(function(b){b.classList.toggle('on',b.dataset.t===t)});['todo','month','rates'].forEach(function(k){$('#v-'+k).hidden=k!==t})}
 $$('.tab').forEach(function(b){b.onclick=function(){setTab(b.dataset.t);window.scrollTo({top:0,behavior:'smooth'})}});
 
 /* ---------- 회사 정보 ---------- */
@@ -230,6 +241,30 @@ function renderMonth(){
   $$('[data-iss]',v).forEach(function(b){b.onclick=function(){CUR_ISSUE=b.dataset.iss;renderMonth()}});
   $$('.ah',v).forEach(function(b){b.onclick=function(){b.parentElement.classList.toggle('open')}});
   $$('[data-jump]',v).forEach(function(k){k.onclick=function(){var t=document.getElementById(k.dataset.jump);if(t)t.scrollIntoView({behavior:'smooth',block:'start'})}});
+}
+/* ---------- 각종 고시금액 ---------- */
+var RCAT_IC={'최저임금':'💰','4대보험':'🏥','건설업':'🏗️','산재보상':'⛑️','장해·장애인':'♿'};
+function renderRates(){
+  var v=$('#v-rates');var cats=[];RATES.forEach(function(r){if(r.cat&&cats.indexOf(r.cat)<0)cats.push(r.cat)});
+  if(RCAT&&cats.indexOf(RCAT)<0)RCAT='';
+  var L=RATES.filter(function(r){return !RCAT||r.cat===RCAT});
+  var last=RATES.reduce(function(a,r){return r._at&&r._at>a?r._at:a},'');
+  var side='<aside class="lnb"><div class="lnbh">분야별 보기</div><ul>'+
+    '<li><button class="'+(!RCAT?'on':'')+'" data-rc=""><span>📊 전체</span><em>'+RATES.length+'</em></button></li>'+
+    cats.map(function(c){var k=RATES.filter(function(r){return r.cat===c}).length;return '<li><button class="'+(RCAT===c?'on':'')+'" data-rc="'+esc(c)+'"><span>'+(RCAT_IC[c]||'·')+' '+esc(c)+'</span><em>'+k+'</em></button></li>'}).join('')+'</ul>'+
+    '<div class="lnbh sub">바로가기</div><ul class="jump">'+L.map(function(r){return '<li><button data-rj="r-'+esc(r.id)+'"><span>'+esc(r.title)+'</span></button></li>'}).join('')+'</ul>'+
+    '<div class="lnbinfo"><b>업데이트 안내</b>새 고시가 나오면 바로 반영합니다.</div>'+CONTACT_HTML+'</aside>';
+  var h='<div class="crumb">홈 <i>›</i> 각종 고시금액'+(RCAT?' <i>›</i> '+esc(RCAT):'')+'</div>'+
+    '<h2 class="ptitle">'+(RCAT?esc(RCAT)+' 고시금액':'각종 고시금액')+'</h2>'+
+    '<div class="rintro"><div><b>매년 바뀌는 노동·사회보험 고시금액을 연도별로 정리했습니다.</b><br>2027년 값 중 아직 고시되지 않은 항목은 <span class="tbdp">미확정</span>으로 표시하며, 고시되는 대로 업데이트합니다.'+(last?'<span class="rupd">최종 업데이트 '+fmt(new Date(last))+'</span>':'')+'</div>'+
+    '<button class="btn pri" id="rPrint">🖨 고시금액표 인쇄·PDF</button></div>';
+  if(!L.length)h+='<div class="empty">등록된 고시금액이 없습니다.</div>';
+  h+=L.map(function(r){return rateSection(r)}).join('');
+  v.innerHTML='<div class="lay">'+side+'<div class="cont">'+h+'</div></div>';
+  $$('[data-rc]',v).forEach(function(b){b.onclick=function(){RCAT=b.dataset.rc;renderRates();var t=$('#v-rates .cont');if(t&&window.innerWidth<=900)t.scrollIntoView({behavior:'smooth',block:'start'})}});
+  $$('[data-rj]',v).forEach(function(b){b.onclick=function(){var t=document.getElementById(b.dataset.rj);if(t)t.scrollIntoView({behavior:'smooth',block:'start'})}});
+  $('#rPrint').onclick=function(){ratesPrint(RATES,RCAT,ME.name+' 전용')};
+  $$('[data-rq]',v).forEach(function(q){q.addEventListener('input',function(){var w=q.value.trim();$$('#'+q.dataset.rq+' tbody tr').forEach(function(tr){tr.hidden=!!w&&tr.textContent.indexOf(w)<0})})});
 }
 function accItem(m,it){
   var key='issue:'+m.id+':'+it._i,st=CHECKS[key]||'';

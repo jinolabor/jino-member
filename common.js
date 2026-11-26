@@ -176,3 +176,73 @@ function printDoc(items,mode,who,checks,scopeLabel){
   var im=root.querySelector('img');var go=function(){setTimeout(function(){window.print()},60)};
   if(im&&!im.complete){im.onload=go;im.onerror=go}else go();
 }
+
+/* ---------- 각종 고시금액 (화면·인쇄 공통) ---------- */
+function rateCell(v){
+  v=String(v==null?'':v);
+  if(/^미확정/.test(v)){var rest=v.replace(/^미확정\s*[·—-]?\s*/,'');return '<span class="tbdp">미확정</span>'+(rest?'<span class="tbdn">'+esc(rest)+'</span>':'')}
+  return nbParen(esc(v));
+}
+function rateNum(v){return /^[\d,.\s]+(원|%|‰)?$|^-$/.test(String(v||'').trim())}
+function rateTable(r,cls,tid){
+  var cols=r.cols||[],rows=r.rows||[];
+  var hl=cols.map(function(c){return /2027/.test(c)});
+  return '<table class="'+cls+'"'+(tid?' id="'+tid+'"':'')+'><thead><tr>'+cols.map(function(c,i){return '<th'+(hl[i]?' class="hl"':'')+'>'+esc(c)+'</th>'}).join('')+'</tr></thead><tbody>'+
+    rows.map(function(row){
+      var grp=/^■/.test(row[0]||'')&&row.slice(1).every(function(x){return !x});
+      if(grp)return '<tr class="rg"><td colspan="'+cols.length+'">'+esc(String(row[0]).replace(/^■\s*/,''))+'</td></tr>';
+      return '<tr>'+row.map(function(c,i){return i===0?'<th scope="row">'+esc(c)+'</th>':'<td class="'+(rateNum(c)?'n':'')+(hl[i]?' hl':'')+(/^미확정/.test(String(c))?' tbd':'')+'">'+rateCell(c)+'</td>'}).join('')+'</tr>'}).join('')+
+    '</tbody></table>';
+}
+function rateSection(r){
+  var big=(r.rows||[]).length>60,tid='rt-'+r.id;
+  return '<section class="rsec" id="r-'+esc(r.id)+'"><div class="rsh"><span class="rct">'+esc(r.cat||'')+'</span><h3>'+esc(r.title)+'</h3>'+(r.unit?'<span class="run">단위: '+esc(r.unit)+'</span>':'')+'</div>'+
+    (r.pending?'<div class="rpend">⏳ '+esc(r.pending)+'</div>':'')+
+    (big?'<div class="rq"><input type="search" placeholder="🔍 직종명·번호 검색" data-rq="'+tid+'"></div>':'')+
+    '<div class="rtw'+(big?' tall':'')+'">'+rateTable(r,'rtb',tid)+'</div>'+
+    (r.notes?'<div class="rnt">'+richText(r.notes)+'</div>':'')+
+    (r.basis?'<div class="rbs"><b>근거</b> '+esc(r.basis)+'</div>':'')+'</section>';
+}
+function ratesHtml(R,label,who){
+  var h='<div class="pcov"><img src="logo.png" alt=""><div><div class="pbr">NOMU GROUP JINO · 회원사 전용</div><h1>'+esc(SET.period)+' 각종 고시금액'+(label?' — '+esc(label):'')+'</h1>'+
+    '<div class="pmt">'+(who?esc(who)+' · ':'')+R.length+'개 표 · 출력일 '+fmt(TODAY)+' · 「미확정」은 출력일 현재 고시 전인 값입니다</div></div></div>';
+  h+=R.map(function(r){
+    return '<div class="prs"><div class="prh"><b>'+esc(r.title)+'</b>'+(r.unit?'<span>단위: '+esc(r.unit)+'</span>':'')+'</div>'+
+      (r.pending?'<div class="prp">'+esc(r.pending)+'</div>':'')+rateTable(r,'prt'+((r.cols||[]).length>8?' wide':''))+
+      (r.notes?'<div class="prn">'+esc(r.notes)+'</div>':'')+(r.basis?'<div class="prb">근거: '+esc(r.basis)+'</div>':'')+'</div>'}).join('');
+  if(!R.length)h+='<p style="padding:30px;text-align:center;color:#5b6577">해당 항목이 없습니다.</p>';
+  h+='<div class="pft">노무그룹지노 · 용산센트럴파크타워 업무동 1003호 · 문의 02-6080-8558 · timetodh@naver.com · www.jinolabor.com — 본 자료는 회원사 전용으로 제공되며 외부 배포를 삼가 주시기 바랍니다.</div>';
+  return h;
+}
+function printRaw(html){
+  var root=document.getElementById('printroot');if(!root){root=document.createElement('div');root.id='printroot';document.body.appendChild(root)}
+  root.className='pdoc';root.innerHTML=html;
+  document.body.classList.add('printing');
+  var done=function(){document.body.classList.remove('printing');window.removeEventListener('afterprint',done)};
+  window.addEventListener('afterprint',done);
+  var im=root.querySelector('img');var go=function(){setTimeout(function(){window.print()},60)};
+  if(im&&!im.complete){im.onload=go;im.onerror=go}else go();
+}
+function ratesPrint(R,cat,who){
+  var old=document.getElementById('prPrev');if(old)old.remove();
+  var S={scope:cat?'cat':'all'};
+  var cur=function(){return S.scope==='cat'?R.filter(function(r){return r.cat===cat}):R};
+  var lab=function(){return S.scope==='cat'?cat:''};
+  var d=document.createElement('div');d.id='prPrev';d.className='ppv';
+  d.innerHTML='<div class="ppbar"><div class="ppin"><b class="ppt">🖨 고시금액표 미리보기</b>'+
+    (cat?'<div class="ppseg"><button data-v="cat">'+esc(cat)+'</button><button data-v="all">전체</button></div>':'')+
+    '<span class="ppsp"></span><button class="btn pri" data-go>🖨 인쇄 · PDF 저장</button><button class="btn" data-x>닫기</button></div>'+
+    '<div class="ppnote">「인쇄 · PDF 저장」을 누르면 인쇄 창이 열립니다. 대상(프린터)을 <b>「PDF로 저장」</b>으로 고르면 PDF 파일이 됩니다.</div></div>'+
+    '<div class="ppscroll"><div class="ppaper pdoc"></div></div>';
+  document.body.appendChild(d);document.body.classList.add('ppopen');
+  var paper=d.querySelector('.ppaper');
+  var draw=function(){d.querySelectorAll('.ppseg button').forEach(function(x){x.classList.toggle('on',x.dataset.v===S.scope)});paper.innerHTML=ratesHtml(cur(),lab(),who);d.querySelector('.ppscroll').scrollTop=0};
+  var sg=d.querySelector('.ppseg');if(sg)sg.onclick=function(e){var b=e.target.closest('button');if(!b)return;S.scope=b.dataset.v;draw()};
+  var fit=function(){paper.style.zoom='';var w=d.querySelector('.ppscroll').clientWidth-24,pw=paper.offsetWidth;paper.style.zoom=pw>w?(w/pw).toFixed(3):''};
+  var esc_=function(e){if(e.key==='Escape')close()};
+  var close=function(){d.remove();document.body.classList.remove('ppopen');document.removeEventListener('keydown',esc_);window.removeEventListener('resize',fit)};
+  document.addEventListener('keydown',esc_);window.addEventListener('resize',fit);
+  d.querySelector('[data-x]').onclick=close;
+  d.querySelector('[data-go]').onclick=function(){printRaw(ratesHtml(cur(),lab(),who))};
+  draw();fit();
+}

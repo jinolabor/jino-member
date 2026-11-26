@@ -555,3 +555,76 @@ ul.svc span{display:block;font-size:13.5px;color:#b8c8e4;line-height:1.5}
 }
 .msub{display:none}
 @media(max-width:860px){.msub{display:block;font-size:14px;font-weight:700;color:var(--blue);margin:-8px 0 4px}br.pc{display:none}}
+
+/* ===== 로그인: 이용 문의 (2026-11-26) ===== */
+.lask{margin-top:22px;border:1px solid #c9d6ea;border-top:3px solid var(--navy);background:#f5f8fd;padding:18px 20px 16px}
+.lask-h{font-size:17px;font-weight:800;color:var(--navy);margin-bottom:4px}
+.login.mem .lcard .lask-p{margin:0 0 12px;font-size:14.5px;color:var(--ink);line-height:1.6}
+.lask-p b{color:var(--navy)}
+.lask ul{list-style:none;margin:0;padding:0;border-top:1px solid #d5deec}
+.lask li{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid #d5deec;font-size:15.5px}
+.lask .ic{width:22px;text-align:center}
+.lask .k{width:52px;font-weight:700;color:var(--sub);font-size:14.5px}
+.lask .v{font-weight:800;color:var(--ink);text-decoration:none;font-size:16.5px;word-break:break-all}
+.lask span.v{font-weight:600;font-size:15px}
+.lask a.v:hover{color:var(--blue);text-decoration:underline}
+
+/* ===== 각종 고시금액 ===== */
+.tbdp{display:inline-block;background:#fff4e6;color:#d9480f;border:1px solid #ffc078;font-size:12.5px;font-weight:800;padding:0 7px;border-radius:2px;line-height:1.6;vertical-align:1px}
+.tbdn{display:block;font-size:12.5px;color:#8a5a00;margin-top:2px;font-weight:500}
+.rintro{display:flex;gap:16px;align-items:center;justify-content:space-between;background:#f4f7fc;border:1px solid #d5deec;border-left:4px solid var(--navy);padding:14px 18px;font-size:14.5px;color:var(--ink);line-height:1.7;margin-bottom:8px}
+.rintro b{color:var(--navy)}
+.rintro .rupd{display:block;font-size:13px;color:var(--sub);margin-top:2px}
+.rintro .btn{flex:none;white-space:nowrap}
+.rsec{margin:30px 0 8px;scroll-margin-top:70px}
+.rsh{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 12px;padding-left:12px;border-left:4px solid var(--navy);margin-bottom:10px}
+.rsh h3{margin:0;font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-.02em}
+.rsh .rct{font-size:12.5px;font-weight:700;color:#fff;background:var(--navy);padding:1px 8px;border-radius:2px}
+.rsh .run{font-size:13px;color:var(--sub);margin-left:auto}
+.rpend{background:#fff9db;border:1px solid #ffe066;color:#7a5a00;font-size:14px;padding:8px 12px;margin-bottom:10px}
+.rq{margin-bottom:8px}
+.rq input{width:100%;max-width:320px;border:1px solid #b9c2cf;border-radius:3px;padding:8px 10px;font-size:14.5px;font-family:inherit}
+.rtw{overflow-x:auto;background:#fff}
+.rtw.tall{max-height:560px;overflow-y:auto;border-bottom:1px solid var(--line)}
+table.rtb{width:100%;border-collapse:collapse;border-top:2px solid var(--navy);font-size:14.5px;line-height:1.55;background:#fff}
+table.rtb thead th{background:#eef2f8;color:var(--navy);font-weight:800;padding:10px 12px;border-bottom:1px solid #c9d3e2;border-right:1px solid var(--line);text-align:center;white-space:nowrap;position:sticky;top:0;z-index:1}
+table.rtb thead th:last-child,table.rtb td:last-child{border-right:0}
+table.rtb thead th.hl{background:#dbe6f7;color:#0b3d91}
+table.rtb tbody th{background:#f8f9fb;font-weight:700;color:var(--ink);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);min-width:120px}
+table.rtb td{padding:10px 12px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);vertical-align:middle}
+table.rtb td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.rtb td.hl{background:#f3f7fe;font-weight:700}
+table.rtb td.tbd{text-align:center;background:#fffaf2}
+table.rtb tr.rg td{background:#e9eef6;color:var(--navy);font-weight:800;padding:7px 12px}
+table.rtb tbody tr:hover td,table.rtb tbody tr:hover th{background:#f1f6ff}
+.rnt{background:#fafbfc;border:1px solid var(--line);border-top:0;padding:10px 14px;font-size:14px;color:#3b4454}
+.rnt ul.rl{margin:0;padding-left:18px}
+.rbs{font-size:13px;color:var(--sub);padding:6px 2px 0}
+.rbs b{color:var(--navy);margin-right:4px}
+@media(max-width:900px){
+ .rintro{flex-direction:column;align-items:stretch}
+ .rsh .run{margin-left:0;width:100%}
+ table.rtb{font-size:13.5px}
+ table.rtb thead th,table.rtb td,table.rtb tbody th{padding:8px 9px}
+ .lask{padding:14px 14px 12px}
+}
+/* 고시금액 인쇄 */
+.pdoc .prs{margin-bottom:12px;break-inside:auto}
+.pdoc .prh{display:flex;align-items:baseline;gap:8px;border-left:4px solid #1F3864;padding-left:7px;margin:10px 0 5px;break-after:avoid}
+.pdoc .prh b{font-size:11.5pt;color:#1F3864}
+.pdoc .prh span{font-size:8pt;color:#5b6577;margin-left:auto}
+.pdoc .prp{font-size:8.5pt;color:#7a5a00;background:#fff9db;border:1px solid #ffe066;padding:3px 6px;margin-bottom:4px}
+.pdoc table.prt{width:100%;border-collapse:collapse;font-size:8.6pt;border-top:1.5px solid #1F3864}
+.pdoc table.prt.wide{font-size:7.6pt}
+.pdoc table.prt thead{display:table-header-group}
+.pdoc table.prt th{background:#eef2f8;color:#1F3864;border:1px solid #c9d3e2;padding:3px 5px;font-weight:700}
+.pdoc table.prt tbody th{background:#f8f9fb;color:#1d2433;text-align:left}
+.pdoc table.prt td{border:1px solid #d5dbe5;padding:3px 5px}
+.pdoc table.prt td.n{text-align:right;white-space:nowrap}
+.pdoc table.prt td.hl,.pdoc table.prt th.hl{background:#e7effb}
+.pdoc table.prt tr{break-inside:avoid}
+.pdoc table.prt tr.rg td{background:#e9eef6;font-weight:700;color:#1F3864}
+.pdoc .prt .tbdp{font-size:7.5pt;padding:0 4px}
+.pdoc .prt .tbdn{font-size:7pt}
+.pdoc .prn{font-size:8pt;color:#3b4454;white-space:pre-line;margin-top:3px}
+.pdoc .prb{font-size:7.5pt;color:#5b6577;margin-top:2px}
