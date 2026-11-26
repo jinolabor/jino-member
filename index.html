@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <link rel="icon" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
-<link rel="stylesheet" href="style.css?v=202611261411">
+<link rel="stylesheet" href="style.css?v=202611261416">
 </head>
 <body>
 
@@ -88,7 +88,7 @@
 </div>
 <div class="loading" id="loading" hidden>불러오는 중…</div>
 
-<script src="common.js?v=202611261411"></script>
+<script src="common.js?v=202611261416"></script>
 <script>
 var TOKEN='',ME=null,P={},ITEMS=[],ISSUES=[],RATES=[],RCAT='',CHECKS={},TAB='todo',F='open',ALLF={cat:''},CUR_ISSUE=null,OPEN=new Set(),PROF_OPEN=false;
 var TKEY='jino-law-member-token';
@@ -186,7 +186,7 @@ function card(o,opt){
    '<div class="tmain"><div class="tlaw">'+((o.cats||[])[0]?'<span class="tcat">'+esc(o.cats[0])+'</span>':'')+esc(o.law)+tagsHtml(o)+'</div>'+
    '<div class="tsum">'+esc(o.summary)+'</div>'+
    (o.action?'<div class="tact"><b>회사가 할 일</b> · '+esc(o.action)+'</div>':'')+
-   '<div class="tmore">▾ 눌러서 개정 전·후 비교 보기</div></div>'+
+   '<div class="tmore"><span class="tmo">🔍 세부내용 보기 <small>개정 전·후 비교 · 실무 유의사항 · 관련 서식</small> <i>▼</i></span><span class="tmc">세부내용 닫기 <i>▲</i></span></div></div>'+
    '</div>'+
    '<div class="tdet">'+detailHtml(o)+'</div></div>';
 }

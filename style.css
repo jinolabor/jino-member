@@ -628,3 +628,14 @@ table.rtb tbody tr:hover td,table.rtb tbody tr:hover th{background:#f1f6ff}
 .pdoc .prt .tbdn{font-size:7pt}
 .pdoc .prn{font-size:8pt;color:#3b4454;white-space:pre-line;margin-top:3px}
 .pdoc .prb{font-size:7.5pt;color:#5b6577;margin-top:2px}
+/* 세부내용 보기 버튼 (2026-11-26) */
+.tmore{display:flex;width:fit-content;align-items:center;margin-top:10px;font-size:14.5px;font-weight:700;color:var(--blue,#0b57c4);border:1px solid #9fbbe6;background:#f1f6fe;padding:7px 14px;border-radius:3px;cursor:pointer;line-height:1.4}
+.tmore small{font-size:12.5px;font-weight:500;color:#4a6a9a;margin-left:4px}
+.tmore i{font-style:normal;font-size:11px;margin-left:6px}
+.tmore .tmc{display:none}
+.todo .tmain:hover .tmore{background:#e3eefd;border-color:#0b57c4}
+.todo.open .tmore{display:flex;background:#fff;color:var(--sub);border-color:var(--line)}
+.todo.open .tmore .tmo{display:none}
+.todo.open .tmore .tmc{display:inline}
+@media(max-width:900px){.tmore small{display:block;margin:2px 0 0}.tmore{align-items:flex-start}.tmore .tmo i{display:none}}
+@media print{.tmore{display:none!important}}
