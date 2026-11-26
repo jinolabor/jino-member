@@ -639,3 +639,8 @@ table.rtb tbody tr:hover td,table.rtb tbody tr:hover th{background:#f1f6ff}
 .todo.open .tmore .tmc{display:inline}
 @media(max-width:900px){.tmore small{display:block;margin:2px 0 0}.tmore{align-items:flex-start}.tmore .tmo i{display:none}}
 @media print{.tmore{display:none!important}}
+/* 개정사항 인쇄 안내 (2026-11-26) */
+.pintro{margin-bottom:16px}
+.pintro .k{color:var(--ink);background:#e6eefb;padding:0 6px;border-radius:2px;margin-right:2px}
+.pintro .pbtns{flex:none;display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:900px){.pintro .pbtns .btn{flex:1}}

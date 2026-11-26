@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <link rel="icon" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
-<link rel="stylesheet" href="style.css?v=202611261416">
+<link rel="stylesheet" href="style.css?v=202611261417">
 </head>
 <body>
 
@@ -62,7 +62,7 @@
   <span class="ugov">노무그룹지노 자문 회원사 전용 서비스</span>
   <span class="usp"></span>
   <span class="who"><b id="meName"></b> 님 전용</span>
-  <button class="tbtn" id="btnPrint">인쇄·PDF</button>
+  <button class="tbtn" id="btnPrint">🖨 인쇄·PDF 저장</button>
   <button class="tbtn" id="btnOut">로그아웃</button>
  </div></div>
  <header class="top"><div class="wrap topbar">
@@ -88,7 +88,7 @@
 </div>
 <div class="loading" id="loading" hidden>불러오는 중…</div>
 
-<script src="common.js?v=202611261416"></script>
+<script src="common.js?v=202611261417"></script>
 <script>
 var TOKEN='',ME=null,P={},ITEMS=[],ISSUES=[],RATES=[],RCAT='',CHECKS={},TAB='todo',F='open',ALLF={cat:''},CUR_ISSUE=null,OPEN=new Set(),PROF_OPEN=false;
 var TKEY='jino-law-member-token';
@@ -116,7 +116,8 @@ function logout(msg){
   TOKEN='';mem.del(TKEY);mem.sdel(TKEY);$('#app').hidden=true;$('#login').hidden=false;$('#biz').value='';say(msg||'',!!msg);
 }
 $('#btnOut').onclick=function(){logout('')};
-$('#btnPrint').onclick=function(){if(TAB==='rates')ratesPrint(RATES,RCAT,ME.name+' 전용');else printDialog({who:ME.name+' 전용',mineItems:ITEMS,allItems:ITEMS,checks:{}})};
+function todoPrint(mode){var L=ALLF.cat?ITEMS.filter(function(o){return (o.cats||[]).indexOf(ALLF.cat)>=0}):ITEMS;printDialog({who:ME.name+' 전용',mineItems:L,allItems:ITEMS,checks:{},mineLabel:ALLF.cat||''},mode)}
+$('#btnPrint').onclick=function(){if(TAB==='rates')ratesPrint(RATES,RCAT,ME.name+' 전용');else todoPrint('sum')};
 async function api(fn,args){
   try{return await rpcCall(fn,Object.assign({p_token:TOKEN},args||{}))}
   catch(e){if(e.code==='denied'){logout('로그인이 만료되었습니다. 다시 로그인해 주세요.')}throw e}
@@ -207,6 +208,8 @@ function renderTodo(){
     '</ul>'+CONTACT_HTML+'</aside>';
   var h='<div class="crumb">홈 <i>›</i> 개정사항'+(ALLF.cat?' <i>›</i> '+esc(ALLF.cat):'')+'</div>'+
     '<h2 class="ptitle">'+(ALLF.cat?esc(ALLF.cat)+' 개정사항':esc(SET.period)+' 개정사항 전체')+'</h2>';
+  h+='<div class="rintro pintro"><div><b>🖨 개정사항을 인쇄하거나 PDF로 저장할 수 있습니다.</b><br><b class="k">요약본</b> 시행일·주요 내용·회사가 할 일을 표 한 장으로<br><b class="k">상세본</b> 개정 전·후 비교·실무 유의사항·관련 서식까지 모두'+(ALLF.cat?'<span class="rupd">지금 보고 계신 「'+esc(ALLF.cat)+'」 분야만 또는 전체를 골라 출력할 수 있습니다.</span>':'<span class="rupd">사내 보고·교육 자료로 활용하세요. 누르면 화면에서 먼저 미리보기가 열립니다.</span>')+'</div>'+
+    '<div class="pbtns"><button class="btn pri" data-tp="sum">📋 요약본 인쇄·PDF</button><button class="btn pri" data-tp="det">📄 상세본 인쇄·PDF</button></div></div>';
   h+='<div class="sum"><div class="k main"><span>'+(ALLF.cat?esc(ALLF.cat):'전체 분야')+'</span><b>'+L.length+'<small>건</small></b><span>시행일 순으로 정리했습니다</span></div>'+
      '<div class="k late"><span>이미 시행 중</span><b>'+n(0)+'<small>건</small></b></div>'+
      '<div class="k soon"><span>60일 안에 시행</span><b>'+n(1)+'<small>건</small></b></div>'+
@@ -214,6 +217,7 @@ function renderTodo(){
   if(!L.length)h+='<div class="empty">해당 분야의 개정사항이 없습니다.</div>';
   G.forEach(function(g){var X=L.filter(g[2]);if(!X.length)return;h+='<div class="grp '+g[0]+'">'+g[1]+' <span class="n">'+X.length+'건</span></div>'+X.map(function(o){return card(o)}).join('')});
   $('#v-todo').innerHTML='<div class="lay">'+side+'<div class="cont">'+h+'</div></div>';
+  $$('#v-todo [data-tp]').forEach(function(b){b.onclick=function(){todoPrint(b.dataset.tp)}});
   $$('#v-todo [data-cat]').forEach(function(b){b.onclick=function(){ALLF.cat=b.dataset.cat;renderTodo();var t=$('#v-todo .cont');if(t&&window.innerWidth<=900)t.scrollIntoView({behavior:'smooth',block:'start'})}});
 }
 
