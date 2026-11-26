@@ -6,7 +6,7 @@
 <title>[TEAM JINO] 개정법 안내 관리 | 노무그룹지노</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="logo.png">
-<link rel="stylesheet" href="style.css?v=202611261356">
+<link rel="stylesheet" href="style.css?v=202611261400">
 <style>
 .adm table{width:100%;border-collapse:collapse;background:#fff;font-size:14.5px}
 .adm th,.adm td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}
@@ -34,7 +34,7 @@
 .toolbar .sp{flex:1}
 .toolbar input[type=search]{border:1px solid #ced4da;border-radius:8px;padding:7px 10px;font-family:inherit;font-size:14px;min-width:200px}
 .note{font-size:13.5px;color:var(--sub);background:#f8f9fa;border-radius:10px;padding:10px 12px;margin-bottom:12px}
-.asks td{background:#fffaf2}
+.sum.s2{grid-template-columns:1.3fr 1fr 1fr}@media(max-width:900px){.sum.s2{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){.fg{grid-template-columns:1fr}.fg>label{padding-top:0}}
 </style>
 </head>
@@ -69,7 +69,7 @@
   <div class="ttl"><h1>개정법 안내 관리</h1><p>회원사·월별 소식·개정사항 항목을 관리합니다 · TEAM JINO</p></div>
  </div></header>
  <nav class="tabs"><div class="wrap">
-  <button class="tab" data-t="dash">📋 현황<span class="cnt" id="cAsk"></span></button>
+  <button class="tab" data-t="dash">📋 현황</button>
   <button class="tab" data-t="mem">🏢 회원사 관리<span class="cnt" id="cMem"></span></button>
   <button class="tab" data-t="iss">📰 월별 소식<span class="cnt" id="cIss"></span></button>
   <button class="tab" data-t="items">📚 개정사항 항목<span class="cnt" id="cItems"></span></button>
@@ -83,7 +83,7 @@
 </div>
 <div id="ovRoot"></div>
 
-<script src="common.js?v=202611261356"></script>
+<script src="common.js?v=202611261400"></script>
 <script>
 /* ---------- JINO 열쇠 (주소록·급여대행과 같은 구성원 비밀번호) ---------- */
 var KEY_URL='https://raw.githubusercontent.com/jinolabor/config-files/main/key.json', KEY_URLS=[KEY_URL,'https://raw.githubusercontent.com/dhkim0629-ops/config-files/main/key.json'];
@@ -136,7 +136,6 @@ async function loadAll(){
 function render(){
   $('#cMem').textContent=MEMBERS.filter(function(m){return m.active}).length;
   $('#cIss').textContent=ISSUES.length;$('#cItems').textContent=ITEMS.length;
-  var asks=allAsks();$('#cAsk').textContent=asks.length||'';
   renderDash();renderMem();renderIss();renderItems();setTab(TAB);
 }
 function setTab(t){TAB=t;$$('.tab').forEach(function(b){b.classList.toggle('on',b.dataset.t===t)});['dash','mem','iss','items'].forEach(function(k){$('#v-'+k).hidden=k!==t})}
@@ -154,15 +153,13 @@ function itemLabel(key){
   m=/^issue:(\d{4}-\d{2}):(\d+)$/.exec(key);if(m){var s=ISSUES.find(function(x){return x.id===m[1]});var it=s&&s.items&&s.items[+m[2]];return '['+(s?s.title:m[1])+'] '+(it?it.title:'(삭제된 소식)')}
   return key;
 }
-function allAsks(){var L=[];MEMBERS.forEach(function(m){Object.keys(m.checks||{}).forEach(function(k){var c=m.checks[k];if(c.s==='ask')L.push({m:m,k:k,at:c.at})})});return L.sort(function(a,b){return String(b.at).localeCompare(String(a.at))})}
 function progress(m){var M=ITEMS.filter(function(o){return applies(o,m.profile)&&!o.ref});var ch=m.checks||{};var d=M.filter(function(o){var s=(ch['item:'+o.no]||{}).s;return s==='done'||s==='na'}).length;return {n:M.length,d:d,pct:M.length?Math.round(d/M.length*100):0}}
 function renderDash(){
-  var act=MEMBERS.filter(function(m){return m.active}),asks=allAsks();
+  var act=MEMBERS.filter(function(m){return m.active});
   var seen30=act.filter(function(m){return m.last_login&&(Date.now()-new Date(m.last_login))<30*864e5}).length;
-  var h='<div class="sum"><div class="k main"><span>이용 중인 회원사</span><b>'+act.length+'곳</b><span>최근 30일 접속 '+seen30+'곳</span></div>'+
+  var h='<div class="sum s2"><div class="k main"><span>이용 중인 회원사</span><b>'+act.length+'곳</b><span>최근 30일 접속 '+seen30+'곳</span></div>'+
     '<div class="k" onclick="setTab(\'mem\')"><b>'+act.filter(function(m){return !m.last_login}).length+'</b><span>아직 접속 안 함</span></div>'+
-    '<div class="k"><b style="color:var(--ask)">'+asks.length+'</b><span>상담 요청</span></div>'+
-    '<div class="k" onclick="setTab(\'iss\')"><b style="color:var(--tbd)">'+ISSUES.filter(function(s){return s._status==='draft'}).length+'</b><span>검토 대기 초안</span></div></div>';
+        '<div class="k" onclick="setTab(\'iss\')"><b style="color:var(--tbd)">'+ISSUES.filter(function(s){return s._status==='draft'}).length+'</b><span>검토 대기 초안</span></div></div>';
   h+='<div class="pdfbox"><div class="pdfh">🖨 PDF로 저장하기 <small>개정사항 전체 '+ITEMS.length+'건 · 회원사 안내·상담용 자료</small></div><div class="pdfbtns">'+
     '<button class="pdfb" data-pdf="sum"><b>📋 요약본 PDF</b><span>시행일·주요내용·회사 조치사항을 표로 정리 (조치 확인 체크칸 포함)</span></button>'+
     '<button class="pdfb" data-pdf="det"><b>📄 상세본 PDF</b><span>개정 전·후 비교, 실무상 유의사항, 관련 서식까지 모두 포함</span></button></div>'+
@@ -171,11 +168,9 @@ function renderDash(){
     '<div class="setrow"><label>안내 연도</label><input type="text" id="setPeriod" maxlength="20" value="'+esc(SET.period)+'"><span class="muted">예) 2026~2027 → 「2026~2027 노동관계법령 개정 안내」</span></div>'+
     '<div class="setrow"><label>법령 조사 기준일</label><input type="text" id="setBasis" maxlength="20" value="'+esc(SET.basis)+'"><span class="muted">인쇄·PDF 머리에 「법령 조사 기준일」로 표시</span></div>'+
     '<div class="setrow"><label></label><button class="btn pri" id="setSave">저장</button></div></div>';
-  h+='<div class="h2">💬 상담 요청 <small>회원사가 「상담 요청」을 누른 항목입니다. 연락 후 회원사 쪽 표시는 그대로 두셔도 됩니다.</small></div>';
-  h+=asks.length?'<div class="tw"><table><thead><tr><th>요청 일시</th><th>회원사</th><th>항목</th></tr></thead><tbody>'+asks.map(function(a){return '<tr class="asks"><td style="white-space:nowrap">'+ago(a.at)+'</td><td><b>'+esc(a.m.name)+'</b></td><td>'+esc(itemLabel(a.k))+'</td></tr>'}).join('')+'</tbody></table></div>':'<div class="empty">아직 상담 요청이 없습니다.</div>';
   h+='<div class="h2">📈 회원사별 접속 현황</div>';
-  h+=act.length?'<div class="tw"><table><thead><tr><th>회원사</th><th>상담 요청</th><th>마지막 접속</th></tr></thead><tbody>'+act.map(function(m){var ak=Object.values(m.checks||{}).filter(function(c){return c.s==='ask'}).length;
-      return '<tr><td><b>'+esc(m.name)+'</b></td><td>'+(ak?'<span class="pill ask">'+ak+'건</span>':'-')+'</td><td style="white-space:nowrap">'+ago(m.last_login)+(m.login_count?' <span class="muted" style="font-size:12px">('+m.login_count+'회)</span>':'')+'</td></tr>'}).join('')+'</tbody></table></div>':'<div class="empty">등록된 회원사가 없습니다. 「회원사 관리」에서 추가해 주세요.</div>';
+  h+=act.length?'<div class="tw"><table><thead><tr><th>회원사</th><th>마지막 접속</th></tr></thead><tbody>'+act.map(function(m){
+      return '<tr><td><b>'+esc(m.name)+'</b></td><td style="white-space:nowrap">'+ago(m.last_login)+(m.login_count?' <span class="muted" style="font-size:12px">('+m.login_count+'회)</span>':'')+'</td></tr>'}).join('')+'</tbody></table></div>':'<div class="empty">등록된 회원사가 없습니다. 「회원사 관리」에서 추가해 주세요.</div>';
   $('#v-dash').innerHTML=h;
   $('#setSave').onclick=async function(){
     var p=$('#setPeriod').value.trim(),q=$('#setBasis').value.trim();
