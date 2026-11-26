@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <link rel="icon" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
-<link rel="stylesheet" href="style.css?v=202611261423">
+<link rel="stylesheet" href="style.css?v=202611261429">
 </head>
 <body>
 
@@ -88,7 +88,7 @@
 </div>
 <div class="loading" id="loading" hidden>불러오는 중…</div>
 
-<script src="common.js?v=202611261423"></script>
+<script src="common.js?v=202611261429"></script>
 <script>
 var TOKEN='',ME=null,P={},ITEMS=[],ISSUES=[],RATES=[],RCAT='',CHECKS={},TAB='todo',F='open',ALLF={cat:''},CUR_ISSUE=null,OPEN=new Set(),PROF_OPEN=false;
 var TKEY='jino-law-member-token';
@@ -256,11 +256,11 @@ function renderRates(){
   var side='<aside class="lnb"><div class="lnbh">분야별 보기</div><ul>'+
     '<li><button class="'+(!RCAT?'on':'')+'" data-rc=""><span>📊 전체</span><em>'+RATES.length+'</em></button></li>'+
     cats.map(function(c){var k=RATES.filter(function(r){return r.cat===c}).length;return '<li><button class="'+(RCAT===c?'on':'')+'" data-rc="'+esc(c)+'"><span>'+(RCAT_IC[c]||'·')+' '+esc(c)+'</span><em>'+k+'</em></button></li>'}).join('')+'</ul>'+
-    '<div class="lnbh sub">바로가기</div><ul class="jump">'+L.map(function(r){return '<li><button data-rj="r-'+esc(r.id)+'"><span>'+esc(r.title)+'</span></button></li>'}).join('')+'</ul>'+
+    '<div class="lnbh sub">각종 고시표 바로가기</div><ul class="jump">'+L.map(function(r){return '<li><button data-rj="r-'+esc(r.id)+'"><span>'+esc(r.title)+'</span></button></li>'}).join('')+'</ul>'+
     '<div class="lnbinfo"><b>업데이트 안내</b>새 고시가 나오면 바로 반영합니다.</div>'+CONTACT_HTML+'</aside>';
   var h='<div class="crumb">홈 <i>›</i> 각종 고시금액'+(RCAT?' <i>›</i> '+esc(RCAT):'')+'</div>'+
     '<h2 class="ptitle">'+(RCAT?esc(RCAT)+' 고시금액':'각종 고시금액')+'</h2>'+
-    '<div class="rintro"><div><b>매년 바뀌는 노동·사회보험 고시금액을 연도별로 정리했습니다.</b><br>2027년 값 중 아직 고시되지 않은 항목은 <span class="tbdp">미확정</span>으로 표시하며, 고시되는 대로 업데이트합니다.'+(last?'<span class="rupd">최종 업데이트 '+fmt(new Date(last))+'</span>':'')+'</div>'+
+    '<div class="rintro"><div><b>매년 바뀌는 노동·사회보험 고시금액을 연도별로 정리했습니다.</b><br>2027년 값 중 아직 고시되지 않은 항목은 <span class="tbdp">미확정</span>으로 표시하며, 고시되는 대로 업데이트합니다.<br>인쇄할 때는 필요한 표만 골라 출력할 수 있습니다.'+(last?'<span class="rupd">최종 업데이트 '+fmt(new Date(last))+'</span>':'')+'</div>'+
     '<button class="btn pri" id="rPrint">🖨 고시금액표 인쇄·PDF</button></div>';
   if(!L.length)h+='<div class="empty">등록된 고시금액이 없습니다.</div>';
   h+=L.map(function(r){return rateSection(r)}).join('');
@@ -268,6 +268,7 @@ function renderRates(){
   $$('[data-rc]',v).forEach(function(b){b.onclick=function(){RCAT=b.dataset.rc;renderRates();var t=$('#v-rates .cont');if(t&&window.innerWidth<=900)t.scrollIntoView({behavior:'smooth',block:'start'})}});
   $$('[data-rj]',v).forEach(function(b){b.onclick=function(){var t=document.getElementById(b.dataset.rj);if(t)t.scrollIntoView({behavior:'smooth',block:'start'})}});
   $('#rPrint').onclick=function(){ratesPrint(RATES,RCAT,ME.name+' 전용')};
+  $$('[data-rp]',v).forEach(function(b){b.onclick=function(){ratesPrint(RATES,RCAT,ME.name+' 전용',b.dataset.rp)}});
   $$('[data-rq]',v).forEach(function(q){q.addEventListener('input',function(){var w=q.value.trim();$$('#'+q.dataset.rq+' tbody tr').forEach(function(tr){tr.hidden=!!w&&tr.textContent.indexOf(w)<0})})});
 }
 function accItem(m,it){

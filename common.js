@@ -196,7 +196,7 @@ function rateTable(r,cls,tid){
 }
 function rateSection(r){
   var big=(r.rows||[]).length>60,tid='rt-'+r.id;
-  return '<section class="rsec" id="r-'+esc(r.id)+'"><div class="rsh"><span class="rct">'+esc(r.cat||'')+'</span><h3>'+esc(r.title)+'</h3>'+(r.unit?'<span class="run">단위: '+esc(r.unit)+'</span>':'')+'</div>'+
+  return '<section class="rsec" id="r-'+esc(r.id)+'"><div class="rsh"><span class="rct">'+esc(r.cat||'')+'</span><h3>'+esc(r.title)+'</h3>'+(r.unit?'<span class="run">단위: '+esc(r.unit)+'</span>':'')+'<button type="button" class="rpbtn" data-rp="'+esc(r.id)+'">🖨 이 표만 인쇄</button></div>'+
     (r.pending?'<div class="rpend">⏳ '+esc(r.pending)+'</div>':'')+
     (big?'<div class="rq"><input type="search" placeholder="🔍 직종명·번호 검색" data-rq="'+tid+'"></div>':'')+
     '<div class="rtw'+(big?' tall':'')+'">'+rateTable(r,'rtb',tid)+'</div>'+
@@ -223,26 +223,36 @@ function printRaw(html){
   var im=root.querySelector('img');var go=function(){setTimeout(function(){window.print()},60)};
   if(im&&!im.complete){im.onload=go;im.onerror=go}else go();
 }
-function ratesPrint(R,cat,who){
+function ratesPrint(R,cat,who,only){
+  // R: 전체 표, cat: 지금 보는 분야(없으면 전체), only: 처음부터 골라 둘 표 id 하나
   var old=document.getElementById('prPrev');if(old)old.remove();
-  var S={scope:cat?'cat':'all'};
-  var cur=function(){return S.scope==='cat'?R.filter(function(r){return r.cat===cat}):R};
-  var lab=function(){return S.scope==='cat'?cat:''};
+  var sel={};R.forEach(function(r){sel[r.id]=only?r.id===only:(!cat||r.cat===cat)});
+  var cur=function(){return R.filter(function(r){return sel[r.id]})};
+  var cats=[];R.forEach(function(r){if(r.cat&&cats.indexOf(r.cat)<0)cats.push(r.cat)});
   var d=document.createElement('div');d.id='prPrev';d.className='ppv';
-  d.innerHTML='<div class="ppbar"><div class="ppin"><b class="ppt">🖨 고시금액표 미리보기</b>'+
-    (cat?'<div class="ppseg"><button data-v="cat">'+esc(cat)+'</button><button data-v="all">전체</button></div>':'')+
+  d.innerHTML='<div class="ppbar"><div class="ppin"><b class="ppt">🖨 고시금액표 미리보기</b><span class="ppcnt"></span>'+
     '<span class="ppsp"></span><button class="btn pri" data-go>🖨 인쇄 · PDF 저장</button><button class="btn" data-x>닫기</button></div>'+
-    '<div class="ppnote">「인쇄 · PDF 저장」을 누르면 인쇄 창이 열립니다. 대상(프린터)을 <b>「PDF로 저장」</b>으로 고르면 PDF 파일이 됩니다.</div></div>'+
+    '<div class="ppsel"><span class="pplb">출력할 표 선택</span><button type="button" class="ppq" data-all="1">전체 선택</button><button type="button" class="ppq" data-all="0">전체 해제</button>'+
+      cats.map(function(c){return '<button type="button" class="ppq" data-cat="'+esc(c)+'">'+esc(c)+'만</button>'}).join('')+
+      '<div class="ppchk">'+R.map(function(r){return '<label><input type="checkbox" data-id="'+esc(r.id)+'"> '+esc(r.title)+'</label>'}).join('')+'</div></div>'+
+    '<div class="ppnote">출력할 표를 체크한 뒤 「인쇄 · PDF 저장」을 누르세요. 대상(프린터)을 <b>「PDF로 저장」</b>으로 고르면 PDF 파일이 됩니다.</div></div>'+
     '<div class="ppscroll"><div class="ppaper pdoc"></div></div>';
   document.body.appendChild(d);document.body.classList.add('ppopen');
   var paper=d.querySelector('.ppaper');
-  var draw=function(){d.querySelectorAll('.ppseg button').forEach(function(x){x.classList.toggle('on',x.dataset.v===S.scope)});paper.innerHTML=ratesHtml(cur(),lab(),who);d.querySelector('.ppscroll').scrollTop=0};
-  var sg=d.querySelector('.ppseg');if(sg)sg.onclick=function(e){var b=e.target.closest('button');if(!b)return;S.scope=b.dataset.v;draw()};
+  var lab=function(){var c=cur();if(c.length===R.length)return '';var cs=[];c.forEach(function(r){if(cs.indexOf(r.cat)<0)cs.push(r.cat)});
+    return cs.length===1&&c.length===R.filter(function(r){return r.cat===cs[0]}).length?cs[0]:''};
+  var draw=function(){
+    d.querySelectorAll('.ppchk input').forEach(function(i){i.checked=!!sel[i.dataset.id]});
+    var n=cur().length;d.querySelector('.ppcnt').textContent=n+' / '+R.length+'개 표';d.querySelector('[data-go]').disabled=!n;
+    paper.innerHTML=n?ratesHtml(cur(),lab(),who):'<p style="padding:60px 20px;text-align:center;color:#5b6577">출력할 표를 하나 이상 체크해 주세요.</p>';fit()};
+  d.querySelectorAll('.ppchk input').forEach(function(i){i.onchange=function(){sel[i.dataset.id]=i.checked;draw()}});
+  d.querySelectorAll('[data-all]').forEach(function(b){b.onclick=function(){R.forEach(function(r){sel[r.id]=b.dataset.all==='1'});draw()}});
+  d.querySelectorAll('.ppsel [data-cat]').forEach(function(b){b.onclick=function(){R.forEach(function(r){sel[r.id]=r.cat===b.dataset.cat});draw()}});
   var fit=function(){paper.style.zoom='';var w=d.querySelector('.ppscroll').clientWidth-24,pw=paper.offsetWidth;paper.style.zoom=pw>w?(w/pw).toFixed(3):''};
   var esc_=function(e){if(e.key==='Escape')close()};
   var close=function(){d.remove();document.body.classList.remove('ppopen');document.removeEventListener('keydown',esc_);window.removeEventListener('resize',fit)};
   document.addEventListener('keydown',esc_);window.addEventListener('resize',fit);
   d.querySelector('[data-x]').onclick=close;
-  d.querySelector('[data-go]').onclick=function(){printRaw(ratesHtml(cur(),lab(),who))};
-  draw();fit();
+  d.querySelector('[data-go]').onclick=function(){if(cur().length)printRaw(ratesHtml(cur(),lab(),who))};
+  draw();
 }
