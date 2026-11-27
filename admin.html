@@ -6,7 +6,7 @@
 <title>[TEAM JINO] 개정법 안내 관리 | 노무그룹지노</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="logo.png">
-<link rel="stylesheet" href="style.css?v=202611261437">
+<link rel="stylesheet" href="style.css?v=202611270029">
 <style>
 .adm table{width:100%;border-collapse:collapse;background:#fff;font-size:14.5px}
 .adm th,.adm td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}
@@ -85,7 +85,7 @@
 </div>
 <div id="ovRoot"></div>
 
-<script src="common.js?v=202611261437"></script>
+<script src="common.js?v=202611270029"></script>
 <script>
 /* ---------- JINO 열쇠 (주소록·급여대행과 같은 구성원 비밀번호) ---------- */
 var KEY_URL='https://raw.githubusercontent.com/jinolabor/config-files/main/key.json', KEY_URLS=[KEY_URL,'https://raw.githubusercontent.com/dhkim0629-ops/config-files/main/key.json'];
@@ -161,7 +161,7 @@ function renderDash(){
   var seen30=act.filter(function(m){return m.last_login&&(Date.now()-new Date(m.last_login))<30*864e5}).length;
   var h='<div class="sum s2"><div class="k main"><span>이용 중인 회원사</span><b>'+act.length+'곳</b><span>최근 30일 접속 '+seen30+'곳</span></div>'+
     '<div class="k" onclick="setTab(\'mem\')"><b>'+act.filter(function(m){return !m.last_login}).length+'</b><span>아직 접속 안 함</span></div>'+
-        '<div class="k" onclick="setTab(\'iss\')"><b style="color:var(--tbd)">'+ISSUES.filter(function(s){return s._status==='draft'}).length+'</b><span>검토 대기 초안</span></div></div>';
+        '<div class="k" onclick="setTab(\'iss\')" style="cursor:pointer" title="월별 소식 탭으로 이동"><b style="color:var(--tbd)">'+ISSUES.filter(function(s){return s._status==='draft'}).length+'<small style="font-size:15px;margin-left:2px">건</small></b><span>게시 전 월별 소식</span><em style="display:block;font-style:normal;font-size:12.5px;color:var(--sub);margin-top:3px">자동 초안을 확인 후 「회원사에 게시」 필요 ›</em></div></div>';
   h+='<div class="pdfbox"><div class="pdfh">🖨 PDF로 저장하기 <small>개정사항 전체 '+ITEMS.length+'건 · 회원사 안내·상담용 자료</small></div><div class="pdfbtns">'+
     '<button class="pdfb" data-pdf="sum"><b>📋 요약본 PDF</b><span>시행일·주요내용·회사 조치사항을 표로 정리 (조치 확인 체크칸 포함)</span></button>'+
     '<button class="pdfb" data-pdf="det"><b>📄 상세본 PDF</b><span>개정 전·후 비교, 실무상 유의사항, 관련 서식까지 모두 포함</span></button>'+
